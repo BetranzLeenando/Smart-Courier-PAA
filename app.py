@@ -89,4 +89,36 @@ def new_map():
         "success": True
     })
 
+@app.route("/random-source")
+def random_source():
+
+    global source
+
+    source = random.choice(nodes)["id"]
+
+    while source == destination:
+        source = random.choice(nodes)["id"]
+
+    return jsonify({
+        "success": True,
+        "source": source
+    })
+
+
+@app.route("/random-destination")
+def random_destination():
+
+    global destination
+
+    destination = random.choice(nodes)["id"]
+
+    while destination == source:
+        destination = random.choice(nodes)["id"]
+
+    return jsonify({
+        "success": True,
+        "destination": destination
+    })
+
+
 
