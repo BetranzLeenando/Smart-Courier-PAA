@@ -996,3 +996,16 @@ document
     }
 );
 
+function resizeCanvas() {
+    const container = canvas.parentElement;
+    const rect = container.getBoundingClientRect();
+    canvas.width = Math.floor(rect.width);
+    canvas.height = Math.floor(rect.height);
+    
+    // Clear cached gradients on resize
+    cachedGradients.node = null;
+    cachedGradients.destination = null;
+    
+    if (graphData) drawGraph();
+}
+
