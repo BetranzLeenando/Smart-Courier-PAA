@@ -62,3 +62,29 @@ def dijkstra(
     path = []
 
 
+    if destination in distances:
+
+        current = destination
+
+        while current != start:
+
+            path.append(current)
+
+            current = previous[current]
+
+        path.append(start)
+
+        path.reverse()
+
+    return (
+        path,
+        visited_order,
+        round(
+            distances.get(
+                destination,
+                0
+            ),
+            2
+        )
+    )
+
