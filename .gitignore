@@ -1,0 +1,11 @@
+# Mengabaikan folder cache dan konfigurasi IDE
+__pycache__/
+.vscode/
+
+# Mengabaikan file jatah Zidan
+graph/generator.py
+templates/index.html
+static/css/style.css
+
+# Mengabaikan file jatah Ferdy & Rafa (jika main.js ada di folder static/js)
+static/js/main.js
