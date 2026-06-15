@@ -514,3 +514,516 @@ function drawGraph(){
     
     ctx.setLineDash([]);
     ctx.restore();
+
+    // nodes - Draw as buildings/locations
+
+    for(const node of graphData.nodes){
+
+        ctx.save();
+        
+        const x = scaleX(node.x);
+        const y = scaleY(node.y);
+        
+        // Draw building shadow
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+        ctx.beginPath();
+        ctx.arc(x + 2, y + 2, 12, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Draw building base
+        ctx.fillStyle = '#1e293b';
+        ctx.beginPath();
+        ctx.arc(x, y, 12, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Draw building detail (like a pin marker)
+        const pinGradient = ctx.createRadialGradient(x, y - 3, 0, x, y - 3, 10);
+        pinGradient.addColorStop(0, '#475569');
+        pinGradient.addColorStop(1, '#334155');
+        
+        ctx.fillStyle = pinGradient;
+        ctx.beginPath();
+        ctx.arc(x, y, 10, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Draw inner circle
+        ctx.fillStyle = '#64748b';
+        ctx.beginPath();
+        ctx.arc(x, y, 6, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Add glow
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = 'rgba(148, 163, 184, 0.5)';
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, Math.PI * 2);
+        ctx.stroke();
+        
+        ctx.restore();
+    }
+
+    // source
+
+    const source =
+    getNode(
+        graphData.source
+    );
+
+    ctx.save();
+    
+    // Animated pulse for source
+    const pulseTime = Date.now() % 1500;
+    const pulseScale = 1 + (Math.sin(pulseTime / 1500 * Math.PI * 2) * 0.15);
+    
+    // Double ring effect
+    ctx.strokeStyle = '#facc15';
+    ctx.lineWidth = 3;
+    ctx.shadowBlur = 20;
+    ctx.shadowColor = 'rgba(250, 204, 21, 0.8)';
+    
+    ctx.beginPath();
+    ctx.arc(
+        scaleX(source.x),
+        scaleY(source.y),
+        18 * pulseScale,
+        0,
+        Math.PI * 2
+    );
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.arc(
+        scaleX(source.x),
+        scaleY(source.y),
+        24 * pulseScale,
+        0,
+        Math.PI * 2
+    );
+    ctx.stroke();
+    
+    // Inner filled circle
+    ctx.fillStyle = '#facc15';
+    ctx.shadowBlur = 15;
+
+    ctx.beginPath();
+
+    ctx.arc(
+        scaleX(source.x),
+        scaleY(source.y),
+        12,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+    
+    // Draw location name
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#fef3c7';
+    ctx.font = 'bold 12px Inter, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText(LOCATION_NAMES[source.id] || `Node ${source.id}`, scaleX(source.x), scaleY(source.y) + 20);
+    
+    ctx.restore();
+
+    // destination
+
+    const destination =
+    getNode(
+        graphData.destination
+    );
+
+    ctx.save();
+    
+    // Animated pulse for destination
+    const destPulseTime = Date.now() % 1200;
+    const destPulseScale = 1 + (Math.sin(destPulseTime / 1200 * Math.PI * 2) * 0.2);
+    const destPulseOpacity = 0.5 + (Math.sin(destPulseTime / 1200 * Math.PI * 2) * 0.3);
+    
+    // Outer glow ring
+    ctx.strokeStyle = `rgba(239, 68, 68, ${destPulseOpacity})`;
+    ctx.lineWidth = 4;
+    ctx.shadowBlur = 25;
+    ctx.shadowColor = 'rgba(239, 68, 68, 0.9)';
+    
+    ctx.beginPath();
+    ctx.arc(
+        scaleX(destination.x),
+        scaleY(destination.y),
+        20 * destPulseScale,
+        0,
+        Math.PI * 2
+    );
+    ctx.stroke();
+    
+    // Inner filled circle with gradient
+    const destGradient = ctx.createRadialGradient(
+        scaleX(destination.x), scaleY(destination.y), 0,
+        scaleX(destination.x), scaleY(destination.y), 12
+    );
+    destGradient.addColorStop(0, '#fca5a5');
+    destGradient.addColorStop(1, '#ef4444');
+    
+    ctx.fillStyle = destGradient;
+    ctx.shadowBlur = 15;
+
+    ctx.beginPath();
+
+    ctx.arc(
+        scaleX(destination.x),
+        scaleY(destination.y),
+        12,
+        0,
+        Math.PI * 2
+    );
+
+    ctx.fill();
+    
+    // Draw location name
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = '#fecaca';
+    ctx.font = 'bold 12px Inter, Arial, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText(LOCATION_NAMES[destination.id] || `Node ${destination.id}`, scaleX(destination.x), scaleY(destination.y) + 20);
+    
+    ctx.restore();
+
+    drawCourier();
+    drawParticles();
+}
+
+// Particle system for exhaust effects
+function createParticle(x, y) {
+    particles.push({
+        x: x,
+        y: y,
+        vx: (Math.random() - 0.5) * 2,
+        vy: (Math.random() - 0.5) * 2,
+        life: 1.0,
+        size: 2 + Math.random() * 3
+    });
+}
+
+function updateParticles() {
+    for(let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.life -= 0.02;
+        p.size *= 0.95;
+        
+        if(p.life <= 0) {
+            particles.splice(i, 1);
+        }
+    }
+}
+
+function drawParticles() {
+    ctx.save();
+    for(const p of particles) {
+        ctx.fillStyle = `rgba(100, 116, 139, ${p.life * 0.5})`;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+    }
+    ctx.restore();
+    updateParticles();
+}
+
+function drawCourier(){
+
+    if(
+        !courierPosition ||
+        !courierImage
+    ) return;
+
+    const width = 48;
+    const height = 48;
+    
+    // Create exhaust particles
+    if(Math.random() < 0.3) {
+        const backX = courierPosition.x - Math.cos(courierRotation) * 20;
+        const backY = courierPosition.y - Math.sin(courierRotation) * 20;
+        createParticle(backX, backY);
+    }
+
+    ctx.save();
+    
+    // Draw shadow
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+    ctx.beginPath();
+    ctx.ellipse(
+        courierPosition.x + 3,
+        courierPosition.y + 3,
+        width / 2 - 5,
+        height / 4,
+        courierRotation,
+        0,
+        Math.PI * 2
+    );
+    ctx.fill();
+
+    ctx.translate(
+        courierPosition.x,
+        courierPosition.y
+    );
+
+    ctx.rotate(courierRotation);
+    
+    // Draw glow around car
+    ctx.shadowBlur = 15;
+    ctx.shadowColor = 'rgba(56, 189, 248, 0.6)';
+
+    ctx.drawImage(
+
+        courierImage,
+
+        -width / 2,
+
+        -height / 2,
+
+        width,
+
+        height
+    );
+
+    ctx.restore();
+}
+
+async function startDelivery(){
+
+    currentVisited = [];
+    currentPath = [];
+    visitedTimestamps = {};
+
+    const animationInterval =
+    setInterval(
+        drawGraph,
+        30
+    );
+
+    for(
+        const node
+        of graphData.visited
+    ){
+
+        currentVisited.push(
+            node
+        );
+
+        visitedTimestamps[node] =
+        Date.now();
+
+        await sleep(150);
+    }
+
+    for(
+        const node
+        of graphData.path
+    ){
+
+        currentPath.push(
+            node
+        );
+
+        await sleep(150);
+    }
+
+    clearInterval(
+        animationInterval
+    );
+
+    await animateCourier();
+}
+
+async function animateCourier(){
+
+    const path =
+    graphData.path;
+    
+    // Constant speed in pixels per millisecond
+    const speed = 0.3; // adjust this for faster/slower movement
+
+    for(
+        let i = 0;
+        i < path.length - 1;
+        i++
+    ){
+
+        const a =
+        getNode(path[i]);
+
+        const b =
+        getNode(path[i+1]);
+
+        // Calculate rotation using scaled coordinates
+        const scaledAx = scaleX(a.x);
+        const scaledAy = scaleY(a.y);
+        const scaledBx = scaleX(b.x);
+        const scaledBy = scaleY(b.y);
+
+        const dx = scaledBx - scaledAx;
+        const dy = scaledBy - scaledAy;
+        
+        // Calculate distance
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        // Calculate duration based on distance to maintain constant speed
+        const duration = distance / speed;
+        const frameTime = 25; // milliseconds per frame
+        const frames = Math.max(1, Math.ceil(duration / frameTime));
+        const step = 1 / frames;
+
+        courierRotation =
+        Math.atan2(dy, dx);
+
+        for(
+            let t = 0;
+            t <= 1;
+            t += step
+        ){
+
+            courierPosition = {
+
+                x: scaledAx + dx * t,
+
+                y: scaledAy + dy * t
+            };
+
+            drawGraph();
+
+            await sleep(frameTime);
+        }
+        
+        // Ensure we reach the exact end point
+        courierPosition = {
+            x: scaledBx,
+            y: scaledBy
+        };
+        drawGraph();
+    }
+}
+
+document
+.getElementById("sourceBtn")
+.addEventListener(
+    "click",
+    async () => {
+
+        console.log("SOURCE CLICK");
+
+        const response =
+        await fetch("/random-source");
+
+        const data =
+        await response.json();
+
+        console.log(data);
+
+        await loadGraph();
+    }
+);
+
+const startBtn =
+document.getElementById("startBtn");
+
+if(startBtn){
+
+    startBtn.addEventListener(
+        "click",
+        async () => {
+
+            console.log("START CLICK");
+
+            await startDelivery();
+        }
+    );
+}
+
+const clearBtn =
+document.getElementById("clearBtn");
+
+if(clearBtn){
+
+    clearBtn.addEventListener(
+        "click",
+        () => {
+
+            console.log("CLEAR CLICK");
+
+            currentVisited = [];
+            currentPath = [];
+            courierPosition = null;
+
+            drawGraph();
+        }
+    );
+}
+
+document
+.getElementById(
+    "mapBtn"
+)
+.addEventListener(
+    "click",
+    async () => {
+
+        await fetch(
+            "/new-map"
+        );
+
+        await loadGraph();
+    }
+);
+
+document
+.getElementById(
+    "destinationBtn"
+)
+.addEventListener(
+    "click",
+    async () => {
+
+        await fetch(
+            "/random-destination"
+        );
+
+        await loadGraph();
+    }
+);
+
+function resizeCanvas() {
+    const container = canvas.parentElement;
+    const rect = container.getBoundingClientRect();
+    canvas.width = Math.floor(rect.width);
+    canvas.height = Math.floor(rect.height);
+    
+    // Clear cached gradients on resize
+    cachedGradients.node = null;
+    cachedGradients.destination = null;
+    
+    if (graphData) drawGraph();
+}
+
+// Continuous animation loop for smooth effects
+function animate() {
+    if (graphData) {
+        drawGraph();
+    }
+    requestAnimationFrame(animate);
+}
+
+window.addEventListener("resize", resizeCanvas);
+
+loadCourierImage();
+
+// wait for layout then resize before loading graph
+requestAnimationFrame(() => {
+    resizeCanvas();
+    loadGraph();
+    animate(); // Start animation loop
+});
