@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Courier Pro</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<header class="header">
+    <h1>🚚 Smart Courier</h1>
+    <div class="algorithm-badge">DIJKSTRA SHORTEST PATH</div>
+</header>
+
+<section class="toolbar">
+    <div class="toolbar-group">
+        <button id="mapBtn">🗺️ New Map</button>
+        <button id="sourceBtn">📍 Source</button>
+        <button id="destinationBtn">🎯 Destination</button>
+    </div>
+    <div class="toolbar-group">
+        <button id="startBtn">▶ Start</button>
+        <button id="clearBtn">⟲ Clear</button>
+    </div>
+</section>
+
+<div class="stats-row">
+    <div class="stats">
+        <div class="card">
+            <span>Nodes</span>
+            <strong id="nodesCount">0</strong>
+        </div>
+        <div class="card">
+            <span>Edges</span>
+            <strong id="edgesCount">0</strong>
+        </div>
+        <div class="card">
+            <span>Distance</span>
+            <strong id="distance">0</strong>
+        </div>
+        <div class="card">
+            <span>Visited</span>
+            <strong id="visitedCount">0</strong>
+        </div>
+        <div class="card">
+            <span>Time</span>
+            <strong id="executionTime">0 ms</strong>
+        </div>
+    </div>
+    <div class="info-panel">
+        <div class="info-box">
+            <span>From</span>
+            <strong id="currentSource">-</strong>
+        </div>
+        <div class="info-box">
+            <span>To</span>
+            <strong id="currentDestination">-</strong>
+        </div>
+    </div>
+</div>
+
+<section class="legend">
+    <div>⚪ Node</div>
+    <div>🔵 Visited</div>
+    <div>🟢 Path</div>
+    <div>📍 Source</div>
+    <div>🎯 Destination</div>
+</section>
+
+<section class="canvas-container">
+    <canvas id="graphCanvas" width="1200" height="700"></canvas>
+</section>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
