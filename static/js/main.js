@@ -996,34 +996,3 @@ document
     }
 );
 
-function resizeCanvas() {
-    const container = canvas.parentElement;
-    const rect = container.getBoundingClientRect();
-    canvas.width = Math.floor(rect.width);
-    canvas.height = Math.floor(rect.height);
-    
-    // Clear cached gradients on resize
-    cachedGradients.node = null;
-    cachedGradients.destination = null;
-    
-    if (graphData) drawGraph();
-}
-
-// Continuous animation loop for smooth effects
-function animate() {
-    if (graphData) {
-        drawGraph();
-    }
-    requestAnimationFrame(animate);
-}
-
-window.addEventListener("resize", resizeCanvas);
-
-loadCourierImage();
-
-// wait for layout then resize before loading graph
-requestAnimationFrame(() => {
-    resizeCanvas();
-    loadGraph();
-    animate(); // Start animation loop
-});
